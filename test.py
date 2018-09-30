@@ -2,7 +2,7 @@ from urllib import request
 from bs4 import BeautifulSoup  # Beautiful Soup是一个可以从HTML或XML文件中提取结构化数据的Python库
 
 # 构造头文件，模拟浏览器访问
-url = "http://www.jianshu.com"
+url = "https://www.jianshu.com"
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
 page = request.Request(url, headers=headers)
@@ -23,7 +23,7 @@ titles = soup.find_all('a', 'title')  # 查找所有a标签中class='title'的�
 '''
 
 # open()是读写文件的函数,with语句会自动close()已打开文件
-with open(r"C:\Users\Hello\Desktop\articles.txt", "w") as file:  # 在磁盘以只写的方式打开/创建一个名为 articles 的txt文件
+with open(r"C:\Users\Hello\Desktop\articles.txt", "w", encoding='utf-8') as file:  # 在磁盘以只写的方式打开/创建一个名为 articles 的txt文件
     for title in titles:
         file.write(title.string + '\n')
         file.write("http://www.jianshu.com" + title.get('href') + '\n\n')
