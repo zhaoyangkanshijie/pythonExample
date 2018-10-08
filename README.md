@@ -199,6 +199,171 @@ Beautiful Soup支持Python标准库中的HTML解析器,还支持一些第三方�
 |lxml XML 解析器 |BeautifulSoup(markup, [“lxml”, “xml”])<br>BeautifulSoup(markup, “xml”)|速度快<br>唯一支持XML的解析器|需要安装C语言库|
 |html5lib       |BeautifulSoup(markup, “html5lib”)|最好的容错性<br>以浏览器的方式解析文档<br>生成HTML5格式的文档|速度慢|
 
+2. 应用实例
+
+```python
+from bs4 import BeautifulSoup
+
+# html字符串创建BeautifulSoup对象
+soup = BeautifulSoup(html_doc, 'html.parser', from_encoding='utf-8')
+# 或者打开本地文件
+soup = BeautifulSoup(open('index.html'))
+# 格式化输出
+print soup.prettify()
+#输出第一个 title 标签
+print soup.title
+#输出第一个 title 标签的标签名称
+print soup.title.name
+#输出第一个 title 标签的包含内容
+print soup.title.string
+#输出第一个 title 标签的父标签的标签名称
+print soup.title.parent.name
+#输出第一个  p 标签
+print soup.p
+#输出第一个  p 标签的 class 属性内容
+print soup.p['class']
+#输出第一个  a 标签的  href 属性内容
+print soup.a['href']
+# soup的属性可以被添加,删除或修改. 再说一次, soup的属性操作方法与字典一样
+#修改第一个 a 标签的href属性为 http://www.baidu.com/
+soup.a['href'] = 'http://www.baidu.com/'
+#删除第一个 a 标签的 class 属性为
+del soup.a['class']
+##输出第一个  p 标签的所有子节点
+print soup.p.contents
+#输出第一个  a 标签
+print soup.a
+#输出所有的  a 标签，以列表形式显示
+print soup.find_all('a')
+#输出第一个 id 属性等于  link3 的  a 标签
+print soup.find(id="link3")
+#获取所有文字内容
+print(soup.get_text())
+#输出第一个  a 标签的所有属性信息
+print soup.a.attrs
+for link in soup.find_all('a'):
+    #获取 link 的  href 属性内容
+    print(link.get('href'))
+#对soup.p的子节点进行循环输出    
+for child in soup.p.children:
+    print(child)
+#正则匹配，名字中带有b的标签
+for tag in soup.find_all(re.compile("b")):
+    print(tag.name)
+```
+
+3. 详解
+
+* 四大对象种类：print type(soup.a)
+1. Tag 通过soup.标签名，获取含整个标签内容，通过soup.标签名.属性/attrs，获取属性数组
+2. NavigableString 通过soup.标签名.string，获取含标签内容文字
+3. BeautifulSoup 可以获取soup.name
+4. Comment 需要处理掉注释
+```python
+if type(soup.a.string)==bs4.element.Comment:
+    print soup.a.string
+```
+
+* 遍历文档树
+
+1. 直接子节点
+
+Tag.Tag_child1：直接通过下标名称访问子节点。
+
+Tag.contents：以列表形式返回所有子节点。
+
+Tag.children：生成器，可用于循环访问：for child in Tag.children
+
+2. 所有子孙节点
+```python
+for child in soup.descendants:
+    print child
+```
+
+3. 父节点
+
+Tag.parent：父节点
+
+Tag.parents：父到根的所有节点
+
+4. 兄弟节点
+
+Tag.next_sibling
+
+Tag.next_siblings
+
+Tag.previous_sibling
+
+Tag.previous_siblings
+
+5. 前后节点
+
+.next_element
+
+.previous_element
+
+.next_elements
+
+.previous_elements
+
+6. 搜索文档树
+
+find_all( name , attrs , recursive , text , **kwargs )
+
+recursive=False，搜直接子孙节点，否则搜全部子孙节点
+
+```python
+import re # 正则搜索
+for tag in soup.find_all(re.compile("^b")):
+    print(tag.name)
+# 搜索列表
+soup.find_all(["a", "b"])
+# True 可以匹配任何值,下面代码查找到所有的tag,但是不会返回字符串节点
+for tag in soup.find_all(True):
+    print(tag.name)
+# 传方法
+def has_class_but_no_id(tag):
+    return tag.has_attr('class') and not tag.has_attr('id')
+
+soup.find_all(has_class_but_no_id)
+# keyword 参数
+soup.find_all(id='link2')
+soup.find_all("a", class_="sister")
+# text 参数
+soup.find_all(text="Elsie")
+soup.find_all(text=["Tillie", "Elsie", "Lacie"])
+# limit 参数
+soup.find_all("a", limit=2)
+```
+
+7. CSS选择器搜索
+```python
+# 所有css表达式，标签名、类名、id 名、组合、属性
+soup.select('表达式') 
+#遍历
+for tag in soup.select('a'):
+    print tag.get_text()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
