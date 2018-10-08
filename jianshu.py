@@ -23,7 +23,7 @@ titles = soup.find_all('a', 'title')  # 查找所有a标签中class='title'的�
 '''
 
 # open()是读写文件的函数,with语句会自动close()已打开文件
-with open(r"C:\Users\Hello\Desktop\articles.txt", "w", encoding='utf-8') as file:  # 在磁盘以只写的方式打开/创建一个名为 articles 的txt文件
+with open(r"D:\项目\pythonExample\articles.txt", "w", encoding='utf-8') as file:  # 在磁盘以只写的方式打开/创建一个名为 articles 的txt文件
     for title in titles:
         file.write(title.string + '\n')
         file.write("http://www.jianshu.com" + title.get('href') + '\n\n')
