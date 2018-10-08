@@ -345,26 +345,30 @@ for tag in soup.select('a'):
     print tag.get_text()
 ```
 
+## pyspider
 
+一个国人编写的强大的网络爬虫系统并带有强大的WebUI。采用Python语言编写，分布式架构，支持多种数据库后端，强大的WebUI支持脚本编辑器，任务监视器，项目管理器以及结果查看器。
 
+参考教程：
+* [Python3环境安装PySpider爬虫框架过程](https://www.cnblogs.com/liuliliuli2017/p/6746550.html)
+* [手把手教你写网络爬虫（3）：开源爬虫框架对比](http://python.jobbole.com/89095/)
+* [Python爬虫-pyspider框架的使用](https://www.jianshu.com/p/1f166f320c66)
 
+1. 安装
+```
+pip install pyspider
+或
+sudo apt-get install phantomjs
+```
+测试
+```
+pyspider all
+```
+然后浏览器访问 http://localhost:5000
 
+2. 具体使用
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+[Python爬虫-pyspider框架的使用](https://www.jianshu.com/p/1f166f320c66)
 
 
 
