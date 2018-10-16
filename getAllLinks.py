@@ -32,13 +32,13 @@ globalSet = set()  # 用于全局去重
 badURL = []  # 用于储存打不开的链接
 firstTime = time.time()  # 运行初始时间
 
-# url = input("input url\n")
-# url = url.strip()
-# if url[-1] == "/":
-#     url = url[0:len(url)-1]
-# print(url)
+url = input("input url\n")
+url = url.strip()
+if url[-1] == "/":
+    url = url[0:len(url)-1]
+print(url)
 
-url = "https://www.tp-link.com.cn"
+# url = "https://www.tp-link.com.cn"
 globalQueue.put(url)
 pattern = re.compile("www." + '(.*?)' + ".com")
 domain = pattern.findall(url)
