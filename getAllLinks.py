@@ -38,7 +38,7 @@ if url[-1] == "/":
     url = url[0:len(url)-1]
 print(url)
 
-# url = "https://www.tp-link.com.cn"
+# url = "https://www.tp-link.com.cn/"
 globalQueue.put(url)
 pattern = re.compile("www." + '(.*?)' + ".com")
 domain = pattern.findall(url)
