@@ -1,4 +1,5 @@
 from urllib import request
+from urllib import error
 from bs4 import BeautifulSoup  # Beautiful Soup是一个可以从HTML或XML文件中提取结构化数据的Python库
 from queue import Queue
 import re
@@ -16,9 +17,6 @@ import time
         把所有链接存入队列
     2.在队列中广度优先爬取次级页面链接
         过滤重复链接
-    3.可考虑根据"/"重新聚类链接
-记录：
-    1.解决循环链接问题，局部链接去重后，还要全局链接去重
 '''
 
 globalQueue = Queue()  # 用于广度优先搜索
@@ -26,26 +24,34 @@ globalSet = set()  # 用于全局去重
 badURL = []  # 用于储存打不开的链接
 firstTime = time.time()  # 运行初始时间
 
-url = input("input url\n")
-url = url.strip()
-print(url)
+# url = input("input url\n")
+# url = url.strip()
+# if url[-1] == "/":
+#     url = url[0:len(url)-1]
+# print(url)
 
-# url = "https://www.tp-link.com.cn"
+url = "https://www.tp-link.com.cn"
 globalQueue.put(url)
 pattern = re.compile("www." + '(.*?)' + ".com")
 domain = pattern.findall(url)
 print(domain)
 
-def getLinks(queueLimitLength = 99999,runTimeSecondLimit = 9999):
+# 限制待打开页面数量queueLimitLength，到达此数量时，终止程序
+# 限制结果数量resultLimitLength，到达此数量时，终止程序
+# 限制程序运行秒数runTimeSecondLimit，到达此数量时，终止程序
+def getLinks(queueLimitLength = 99999,resultLimitLength = 99999, runTimeSecondLimit = 9999):
     # 构造头文件，模拟浏览器访问
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'
     }
     currentQueueLength = 1  # 当前队列长度
     while not globalQueue.empty():
+        # print(firstTime, time.time())
         if time.time() - firstTime > runTimeSecondLimit:
             break
         if currentQueueLength > queueLimitLength:
+            break
+        if len(globalSet) > resultLimitLength:
             break
 
         tempURL = globalQueue.get()
@@ -55,7 +61,7 @@ def getLinks(queueLimitLength = 99999,runTimeSecondLimit = 9999):
         try:
             page = request.Request(tempURL, headers=headers)
             page_info = request.urlopen(page).read().decode('utf-8')  # 打开Url,获取HttpResponse返回对象并读取其ResposneBody
-        except ValueError as err:
+        except error.URLError as err:
             print("网络连接错误", err)
             badURL.append(tempURL)   # 打不开的链接
             continue
@@ -83,18 +89,21 @@ def getLinks(queueLimitLength = 99999,runTimeSecondLimit = 9999):
                         continue
                     if tempLink.find(url) != -1:
                         if tempLink not in globalSet:
+                            # print('1:', tempLink, globalSet, tempLink in globalSet)
                             localSet.add(tempLink)
-                        globalSet.add(tempLink)
+                            globalSet.add(tempLink)
                     else:
                         if tempLink.find("/") != -1 and tempLink.find("http") == -1:
-                            if tempLink not in globalSet:
-                                localSet.add(tempLink)
-                            globalSet.add(url + tempLink)
+                            if url + tempLink not in globalSet:
+                                # print('2:', tempLink, globalSet, tempLink in globalSet)
+                                localSet.add(url + tempLink)
+                                globalSet.add(url + tempLink)
                 except ValueError as err:
                     print("链接出错：", err)
                     continue
 
             print(len(localSet), localSet)
+            print(len(globalSet), globalSet)
 
             for href in localSet:
                 globalQueue.put(href)
@@ -107,13 +116,16 @@ def getLinks(queueLimitLength = 99999,runTimeSecondLimit = 9999):
             # time.sleep(5)
 
 
-getLinks()
+getLinks(1000, 2000, 10)
 
 # open()是读写文件的函数,with语句会自动close()已打开文件
 with open(r"D:\项目\pythonExample\webLinks.txt", "w", encoding='utf-8') as file:
+    file.write("链接个数：" + str(len(globalSet)) + '\n\n')
     for item in globalSet:
         file.write(item + '\n\n')
 
-with open(r"D:\项目\pythonExample\webBadLinks.txt", "w", encoding='utf-8') as file:
+with open(r"D:\项目\pythonExample\webBadLinks.txt", "w", encoding='utf-8') as badFile:
+    badFile.write("无法访问链接个数：" + str(len(badURL)) + '\n\n')
     for item in badURL:
-        file.write(item + '\n\n')
+        badFile.write(item + '\n\n')
+
